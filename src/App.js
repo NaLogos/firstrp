@@ -1,67 +1,67 @@
 import React from "react";
 import { render } from "react-dom";
 import Pet from "./pet";
+import pf from "petfinder-client";
+
+const petfinder = pf({
+  key: process.env.API_KEY,
+  secret: process.env.API_SECRET
+});
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pets: []
+    };
+  }
+
+  componentDidMount() {
+    petfinder.pet
+      .find({ output: "full", location: "Seattle, WA" })
+      .then(data => {
+        let pets;
+        if (data.petfinder.pets && data.petfinder.pets.pet) {
+          if (Array.isArray(data.petfinder.pets.pet)) {
+            pets = data.petfinder.pets.pet;
+          } else {
+            pets = [data.petfinder.pets.pet];
+          }
+        } else {
+          pets = [];
+        }
+
+        this.setState({
+          pets
+        });
+      });
+  }
   render() {
     return (
       <div>
         <h1>Embrace Me!</h1>
-        <Pet name="Leo" animal="Lion" breed="African" />
-        <Pet name="Kermit" animal="Frog" breed="Golden Poisonous" />
-        <Pet name="Julius Squeezer" animal="Boa" breed="Anaconda" />
-        <Pet name="Rawr" animal="Bear" breed="Grizzly" />
+        <div>
+          {this.state.pets.map(pet => {
+            let breed;
+            if (Array.isArray(pet.breeds.breed)) {
+              breed = pet.breeds.breed.join(", ");
+            } else {
+              breed = pet.breeds.breed;
+            }
+            return (
+              <Pet
+                key={pet.id}
+                animal={pet.animal}
+                name={pet.name}
+                breed={breed}
+                media={pet.media}
+                location={`${pet.contact.city}, ${pet.contact.state}`}
+              />
+            );
+          })}
+        </div>
       </div>
     );
-    /*return React.createElement("div", {}, [
-      React.createElement("h1", { onClick: this.clickTitle }, "Embrace Me!"),
-      React.createElement(pet, {
-        name: "Leo",
-        animal: "Lion",
-        breed: "African"
-      }),
-      React.createElement(pet, {
-        name: "Kermit",
-        animal: "Frog",
-        breed: "Golden Poisonous"
-      }),
-      React.createElement(pet, {
-        name: "Julius Squeezer",
-        animal: "Boa",
-        breed: "Anaconda"
-      }),
-      React.createElement(pet, {
-        name: "Rawr",
-        animal: "Bear",
-        breed: "Grizzly"
-      })
-    ]);*/
   }
 }
 
 render(React.createElement(App), document.getElementById("root"));
-
-/*const App = () => {
-  return React.createElement("div", {}, [
-    React.createElement("h1", {}, "Embrace Me!"),
-    React.createElement(pet, {
-      name: "Leo",
-      animal: "Lion",
-      breed: "African"
-    }),
-    React.createElement(pet, {
-      name: "Kermit",
-      animal: "Frog",
-      breed: "Golden Poisonous"
-    }),
-    React.createElement(pet, {
-      name: "Julius Squeezer",
-      animal: "Boa",
-      breed: "Anaconda"
-    }),
-    React.createElement(pet, {
-      name: "Rawr",
-      animal: "Bear",
-      breed: "Grizzly"
-    })
-  ]);
-};*/
