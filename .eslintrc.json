@@ -1,4 +1,6 @@
 {
+  "parser": "babel-eslint",
+
   "extends": [
     "eslint:recommended",
     "plugin:import/errors",
@@ -7,6 +9,7 @@
     "prettier",
     "prettier/react"
   ],
+
   "rules": {
     "react/prop-types": 0
   },
